@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  fpm:
+    build:
+      context: .
+      args:
+        - USER=${USERNAME}
+        - UID=${USERUID}
+    image: ${APP_NAME}/php-fpm
+    container_name: ${APP_NAME}-app
+    volumes:
+      - ./docker-config/php/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini
+      - ./docker-config/php/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ./app:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_DATABASE: "${DB_NAME}"
+      DB_USERNAME: root
+      DB_PASSWORD: "${DB_ROOT_PASSWORD}"
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:1.20.2-alpine
+    ports:
+      - ${IP}:80:80
+    volumes:
+      - ./docker-config/nginx:/etc/nginx/conf.d
+      - ./app:/var/www/html
+    depends_on:
+      - fpm
+
+  db:
+    image: mysql:8.0
+    ports:
+      - ${IP}:${MYSQL_PORT}:3306
+    command: [
+      '--default_authentication_plugin=mysql_native_password',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci'
+    ]
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      # https://docs.phpmyadmin.net/en/latest/setup.html#docker-environment-variables
+      PMA_PORT: "${MYSQL_PORT}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+    volumes:
+      - ./docker-config/php/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini
+    ports:
+      - ${IP}:8080:80
+
+volumes:
+  db_data:
