@@ -6,8 +6,9 @@ services:
       context: .
       args:
         - USER=${USERNAME}
-        - UID=${USERUID}
-    image: ${APP_NAME}/php-fpm
+        - UID=${USER_UID}
+        - PHP_VERSION=${PHP_VERSION}
+    image: ${APP_NAME}/${PHP_VERSION}-fpm
     container_name: ${APP_NAME}-app
     volumes:
       - ./docker-config/php/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini

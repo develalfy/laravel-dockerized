@@ -1,8 +1,8 @@
-FROM php:7.4-fpm
+ARG PHP_VERSION
+FROM php:${PHP_VERSION}-fpm
 
-# Arguments defined in docker-compose.yml
-ARG USER
 ARG UID
+ARG USER
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
