@@ -8,7 +8,9 @@ Installation
 * `cd` what you've cloned
 * `cp .env.example .env`
 * Change configuration in the **.env** file
+* `make up` or `docker-compose up -d`
 * Put your **Laravel** files in directory and name that directory **app**
+* `docker-compose exec fpm composer install` or `docker-compose exec fpm bash` to make more magick using bash
 
 Notes
 ------------
